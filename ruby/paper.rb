@@ -23,12 +23,34 @@ class State
         @pos.to_s + '-' + @vel.to_s  
     end
 
-    def steps
-        if parent then parent.steps end
-        puts @pos
+    def parents
+        curr = self
+        l = []
+        while curr
+            l.push(curr)
+            curr = curr.parent
+        end
+        l.reverse
+    end
+
+    def progression_map
+        steps = self.parents.map { |x| x.pos }
+        min = steps.first
+        max = steps.last
+        puts min,max
+        Range.new(min.y, max.y).each do |y|
+            Range.new(min.x, max.x).each do |x|
+                curr = Vec.new(x, y)
+                if steps.include? curr then
+                    print 'x'
+                else
+                    print '.'
+                end
+            end
+            puts
+        end
     end
 end
-
 
 def solve(start, goal)
     state = State.new start, Vec.new(0,0)
@@ -41,9 +63,14 @@ def solve(start, goal)
             end
             to_explore_next += state.choices
         end
+        puts 'L:' + to_explore_next.size.to_s
         to_explore = to_explore_next
         to_explore_next = []
     end
 end
 
-solve(Vec.new(0,0), Vec.new(10,10)).steps
+sol = solve(Vec.new(0,0), Vec.new(12,8))
+puts 'sol:'
+puts sol.parents
+puts 'map:'
+sol.progression_map
